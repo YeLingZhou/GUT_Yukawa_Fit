@@ -8,6 +8,9 @@ import argparse
 import time
 import os
 from itertools import product
+from scipy.optimize import differential_evolution
+import warnings
+warnings.filterwarnings('ignore')
 
 # ==================== Input parameters ====================
 v = 174 * 10**9  # GeV
@@ -114,7 +117,7 @@ def Chi2_M1(d11, d22, d33, s11, s12, s13, s22, s23, s33, s1, s2, s3, s4, s5, s6,
     
     # Diagonal matrix D
     D = np.array([[d11, 0, 0],
-                  [0, d22, 0],
+                  [0,  d22, 0],
                   [0, 0, d33]], dtype=complex)
     
     # Symmetric matric S
@@ -220,8 +223,8 @@ def Chi2_M1(d11, d22, d33, s11, s12, s13, s22, s23, s33, s1, s2, s3, s4, s5, s6,
 
     return total_chi2
 
-def Chi2_M2(s11, s12, s13, s22, s23, s33, d11, d22, d33, a12, a13, a23, alpha, lamb, r1, r4, omega, gamma, m0, neutrino_params):
-    
+def Chi2_M2(s11, s12, s13, s22, s23, s33, d11, d22, d33, a12, a13, a23, alpha, lamb, r1, r4, omega, gamma, m0, neutrino_params):  
+
     delta_ms21 = neutrino_params['delta_ms21']
     delta_ms31 = neutrino_params['delta_ms31']
     delta_ms21_er = neutrino_params['delta_ms21_er']
@@ -444,62 +447,62 @@ def Chi2_M3(s11, s12, s13, s22, s23, s33, d11, d22, d33, a12, a13, a23, r1, r2, 
 def get_parameter_ranges(model_type):
     if model_type == 'M1':
         return {
-            'd11':  (1e-7, 1e-5),
-            'd22':  (1e-5, 1e-3),
-            'd33':  (1e-3, 0.01),
-            's11': (1e-7, 1e-1),
-            's12': (1e-7, 1e-1),
-            's13': (1e-7, 1e-1),
-            's22': (1e-7, 1e-1),
-            's23': (1e-6, 1e-1),
-            's33': (1e-6, 1e-1),
-            's1': (0, 2*np.pi),
-            's2': (0, 2*np.pi),
-            's3': (0, 2*np.pi),
-            's4': (0, 2*np.pi),
-            's5': (0, 2*np.pi),
-            's6': (0, 2*np.pi),
-            'r1': (10, 300),
-            'r2': (1e-3, 1),
-            'omega': (0, 2*np.pi),
-            'm0': (0.0005, 1)
+            'd11': (1e-8, 1e-4),
+            'd22': (1e-4, 1e-2),
+            'd33': (1e-2, 1),
+            's11': (1e-6, 1),
+            's12': (1e-6, 1),
+            's13': (1e-6, 1),
+            's22': (1e-6, 1),
+            's23': (1e-6, 1),
+            's33': (1e-6, 5),
+            's1': (1e-5, 2*np.pi),
+            's2': (1e-5, 2*np.pi),
+            's3': (1e-5, 2*np.pi),
+            's4': (1e-5, 2*np.pi),
+            's5': (1e-5, 2*np.pi),
+            's6': (1e-5, 2*np.pi),
+            'r1': (1e-5, 0.1),
+            'r2': (1e-5, 0.1),
+            'omega': (1e-5, 2*np.pi),
+            'm0': (0.01, 1)
         }
     elif model_type == 'M2':
         return {
-            's11': (-0.02, 0.02),
-            's12': (-0.1, 0.1),
+            's11': (-1, 1),
+            's12': (-1, 1),
             's13': (-1, 1),
             's22': (-1, 1),
-            's23': (-5, 5),
-            's33': (-6, 6),
-            'd11': (1e-8, 1e-4),
-            'd22': (1, 2),
-            'd33': (420, 440),
-            'a12': (-0.1, 0.1),
+            's23': (-1, 1),
+            's33': (-1, 1),
+            'd11': (5e-12, 1e-5),
+            'd22': (1e-5, 2e-3),
+            'd33': (2e-3, 1),
+            'a12': (-1, 1),
             'a13': (-1, 1),
-            'a23': (-5, 5),
-            'alpha': (0, 2*np.pi),
-            'lamb': (0, 2*np.pi),
-            'r1': (1e-5, 0.01),
-            'r4': (0.1, 3),
-            'omega': (0, 2*np.pi),
-            'gamma': (0, 2*np.pi),
-            'm0': (0.0005, 1)
+            'a23': (-1, 1),
+            'alpha': (1e-5, 2*np.pi),
+            'lamb': (1e-5, 2*np.pi),
+            'r1': (1e-5, 3),
+            'r4': (1e-5, 3),
+            'omega': (1e-5, 2*np.pi),
+            'gamma': (1e-5, 2*np.pi),
+            'm0': (0.00005, 3)
         }
     elif model_type == 'M3':
         return {
-            's11': (-0.01, 0.01),      
-            's12': (-0.01, 0.01), 
-            's13': (-0.01, 0.01), 
-            's22': (-0.01, 0.01), 
-            's23': (-0.01, 0.01),      
+            's11': (-1, 1),      
+            's12': (-1, 1), 
+            's13': (-1, 1), 
+            's22': (-1, 1), 
+            's23': (-1, 1),      
             's33': (-1, 1),     
             'd11': (1e-5, 1e-3),  
-            'd22': (5e-3, 1e-1),  
-            'd33': (1e-2, 0.5),     
-            'a12': (-0.01, 0.01), 
-            'a13': (-0.1, 0.1),    
-            'a23': (-0.1, 0.1),   
+            'd22': (1e-3, 5e-2),  
+            'd33': (5e-2, 1),     
+            'a12': (-1, 1), 
+            'a13': (-1, 1),    
+            'a23': (-1, 1),   
             'r1':  (-1, 1),  
             'r2':  (-1, 1),   
             'r3':  (-1, 1),  
@@ -522,454 +525,308 @@ def get_chi2_function(model_type):
     else:
         raise ValueError(f"error input: {model_type}")
 
-# ==================== MPI stage 1 optimization ====================
-def optimize_for_initial_point_mpi(model_type, learning_rate, max_iterations, parameter_ranges, min_lr, max_lr, neutrino_params, seed_offset=0):
-    "optimize with MPI"
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    
-    # get chi^2 values
-    chi2_func = get_chi2_function(model_type)
-    
-    # introduce parameter ranges
-    if isinstance(parameter_ranges, dict):
-        param_ranges_list = list(parameter_ranges.values())
-    else:
-        param_ranges_list = parameter_ranges
-        
-    num_params = len(param_ranges_list)
-    
-    # seeding
-    random.seed(rank + seed_offset)
-    np.random.seed(rank + seed_offset)
-    
-    adaptive_lr = learning_rate
-    no_improvement_count = 0
-    
-    report_interval = max(1, max_iterations // 10)
-    patience = max(10, max_iterations // 20)
-    
-    # random initial ranges
-    current_params = [float(random.uniform(param_ranges_list[i][0], param_ranges_list[i][1])) 
-                     for i in range(num_params)]
-    
-    try:
-        current_loss = float(chi2_func(*current_params, neutrino_params=neutrino_params))
-    except Exception as e:
-        current_loss = float('inf')
-    
-    best_loss = current_loss
-    best_params = current_params.copy()
-    
-    for current_iteration in range(1, max_iterations + 1):
-        try:
-            # Generate random perturbations
-            rand_params = [float(random.uniform(-adaptive_lr, adaptive_lr)) for _ in range(num_params)]
-            
-            # Generate candidate parameters
-            candidate_params = []
-            for i in range(num_params):
-                new_val = float(current_params[i] + rand_params[i])
-                new_val = max(param_ranges_list[i][0], min(param_ranges_list[i][1], new_val))
-                candidate_params.append(new_val)
-            
-            candidate_loss = float(chi2_func(*candidate_params, neutrino_params=neutrino_params))
-            
-            if candidate_loss < current_loss:
-                current_params = candidate_params.copy()
-                current_loss = candidate_loss
-                no_improvement_count = 0
-                
-                if candidate_loss < best_loss:
-                    best_loss = candidate_loss
-                    best_params = candidate_params.copy()
-                    adaptive_lr = min(max_lr, adaptive_lr * 1.05)
-            else:
-                no_improvement_count += 1
-                if no_improvement_count >= patience:
-                    adaptive_lr = max(min_lr, adaptive_lr * 0.5)
-                    no_improvement_count = 0
-            
-            if report_interval > 0 and current_iteration % report_interval == 0:
-                adaptive_lr = max(min_lr, min(max_lr, adaptive_lr))
-                
-        except Exception as e:
-            continue
-    
-    return (float(best_loss), [float(x) for x in best_params])
+# ==================== MPI Initialization ====================
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
+is_master = (rank == 0)
 
-# ==================== MPI stage 2 optimization ====================
-def parallel_table_search_momentum_mpi(model_type, initial_point, total_steps=10000, batch_size=8, 
-                                     parameter_ranges=None, neutrino_params=None):
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    
-    chi2_func = get_chi2_function(model_type)
-    
-    if isinstance(parameter_ranges, dict):
-        param_ranges_list = list(parameter_ranges.values())
-    else:
-        param_ranges_list = parameter_ranges
-    
-    # Compute the stage 2 initial points 
-    if len(initial_point) == len(param_ranges_list) + 1:
-        initial_params = np.array(initial_point[1:])
-        initial_chi2 = initial_point[0]
-    else:
-        initial_params = np.array(initial_point)
-        initial_chi2 = chi2_func(*initial_point, neutrino_params=neutrino_params)
-    
-    dim = len(initial_params)
-    best_point = initial_params.copy()
-    best_chi2 = initial_chi2
-    
-    momentum = 0.0
-    step_size = 0.00003
-    last_improvement = 0
-    
-    # Seeding
-    np.random.seed(rank + int(time.time() * 1000) % 1000000)
-    
-    for step in range(1, total_steps + 1):
-        improvement = 0
-        
-        batch_points = []
-        for _ in range(batch_size):
-            random_perturbation = np.random.uniform(-1, 1, dim)
-            perturbation = (step_size + momentum) * random_perturbation
-            new_point = best_point * (1 + perturbation)
-            batch_points.append(new_point)
-            
-        # Calculate the batch chi-square value
-        batch_chi2s = []
-        for point in batch_points:
-            batch_chi2s.append(chi2_func(*point, neutrino_params=neutrino_params))
-        
-        for i, chi2 in enumerate(batch_chi2s):
-            if chi2 < best_chi2:
-                improvement = best_chi2 - chi2
-                best_point = batch_points[i].copy()
-                best_chi2 = chi2
-                last_improvement = step
-        
-        # momentum adjustment
-        if improvement > 0:
-            momentum = min(0.000003, momentum + 0.000003)
+# ==================== Command-Line Argument Parsing ====================
+parser = argparse.ArgumentParser(description="MPI Optimization for GUT Models")
+parser.add_argument("--model", type=str, default="M2", choices=["M1", "M2", "M3"])
+parser.add_argument("--n-points", type=int, default=100)
+parser.add_argument("--n-generations", type=int, default=200)
+parser.add_argument("--pop-size", type=int, default=15)
+parser.add_argument("--output", type=str, default="mpi_results")
+parser.add_argument("--output-dir", type=str, default="./results", help="output")
+parser.add_argument("--verbose", action="store_true", help="detailed_output")
+parser.add_argument("--octant", type=str, default="1st", choices=["1st", "2nd"])
+args = parser.parse_args()
+
+# ==================== Concise Logging Functions ====================
+def log_info(message):
+    """Print message only from master process, unless verbose mode is enabled"""
+    if is_master or args.verbose:
+        if is_master:
+            print(f"[MASTER] {message}")
         else:
-            momentum = max(0, momentum - 0.000006)
-        
-        # Adjust the step size when there is no improvement for a long time
-        if step - last_improvement > 1000:
-            step_size = min(0.000001, step_size * 1.1)
-            last_improvement = step
-    
-    return best_chi2, best_point.tolist()
+            print(f"[Process {rank}] {message}")
 
-# ==================== Main optimization function of MPI ====================
-def mpi_optimize_stage1(model_type, total_initial_points, iterations_per_point, learning_rate, 
-                       parameter_ranges, neutrino_params, keep_points):
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    size = comm.Get_size()
+def log_important(message):
+    """Display only the most critical information (master process only)"""
+    if is_master:
+        print(f"*** {message} ***")
+
+# ================ Output Directory Initialization ==================
+if is_master:
+    # Create output directory (if it doesn't exist)
+    os.makedirs(args.output_dir, exist_ok=True)
     
-    # Timing
-    stage1_start_time = time.time()
+    # Display optimization configuration summary
+    log_important(f"\n{'='*60}")
+    log_important(f"MPI GUT Optimization - Model: {args.model}, Octant: {args.octant}")
+    log_important(f"Total Points: {args.n_points}, MPI Processes: {size}")
+    log_important(f"DE Settings: {args.n_generations} generations, Population: {args.pop_size}")
+    log_important('='*60)
+
+# ==================== Optimizer Class ====================
+class DirectOptimizer:
+    def __init__(self, model_type, octant='1st'):
+        self.model_type = model_type
+        self.octant = octant
+        self.neutrino_params = setup_neutrino_params(octant)
+        self.chi2_func = get_chi2_function(model_type)
+        self.param_ranges = get_parameter_ranges(model_type)
+        self.param_names = list(self.param_ranges.keys())
+        
+    def get_bounds(self):
+        return [self.param_ranges[name] for name in self.param_names]
     
-    if rank == 0:
-        print(f"MPI Stage 1 Optimization: Total initial points={total_initial_points}, Number of processes={size}")
+    def random_point(self):
+        params = {}
+        for name in self.param_names:
+            min_val, max_val = self.param_ranges[name]
+            if max_val / min_val > 100 and min_val > 0:
+                params[name] = 10**np.random.uniform(np.log10(min_val), np.log10(max_val))
+            else:
+                params[name] = np.random.uniform(min_val, max_val)
+        return params
     
-    # Calculate the tasks of each process
-    points_per_process = total_initial_points // size
-    remainder = total_initial_points % size
+    def params_to_list(self, params_dict):
+        return [params_dict[name] for name in self.param_names]
     
-    if rank < remainder:
-        my_points = points_per_process + 1
-        start_idx = rank * (points_per_process + 1)
-    else:
-        my_points = points_per_process
-        start_idx = remainder * (points_per_process + 1) + (rank - remainder) * points_per_process
+    def list_to_params(self, params_list):
+        return {name: val for name, val in zip(self.param_names, params_list)}
     
-    my_results = []
-    
-    # Start timing
-    process_start_time = time.time()
-    
-    for i in range(my_points):
-        point_id = start_idx + i
+    def evaluate_chi2(self, params):
+        if isinstance(params, dict):
+            params_list = self.params_to_list(params)
+        else:
+            params_list = params
         
         try:
-            best_loss, best_params = optimize_for_initial_point_mpi(
-                model_type=model_type,
-                learning_rate=learning_rate,
-                max_iterations=iterations_per_point,
-                parameter_ranges=parameter_ranges,
-                min_lr=0.0001,
-                max_lr=learning_rate,
-                neutrino_params=neutrino_params,
-                seed_offset=point_id * 1000
+            chi2 = self.chi2_func(*params_list, neutrino_params=self.neutrino_params)
+            if np.isnan(chi2) or np.isinf(chi2):
+                return 1e20
+            return float(chi2)
+        except Exception:
+            return 1e20
+    
+    def optimize_point(self, params, n_generations, pop_size):
+        bounds = self.get_bounds()
+        
+        try:
+            result = differential_evolution(
+                self.evaluate_chi2,
+                bounds,
+                maxiter=n_generations,
+                popsize=pop_size,
+                recombination=0.7,
+                mutation=(0.5, 1.0),
+                strategy='best1bin',
+                disp=False,
+                updating='deferred',
+                atol=1e-6,
+                tol=0.0001,
+                polish=True,
+                workers=1
             )
             
-            # Create simple serializable results
-            result_row = [float(best_loss)] + [float(x) for x in best_params]
-            my_results.append(result_row)
+            opt_params = self.list_to_params(result.x)
+            opt_chi2 = result.fun
+            return (opt_chi2, opt_params, True)
             
-        except Exception as e:
-            continue
-    
-    # Compute the total time for stage 1
-    process_time = time.time() - process_start_time
-    
-    try:
-        all_results = comm.gather(my_results, root=0)
-        all_times = comm.gather(process_time, root=0)
-    except Exception as e:
-        if rank == 0:
-            print(f"MPI collection failed: {e}")
-        return None
-    stage1_total_time = time.time() - stage1_start_time
-    
-    if rank == 0:
-        # Merge all the results
-        combined_results = []
-        for process_results in all_results:
-            if process_results is not None:
-                combined_results.extend(process_results)
-        
-        # Sort and select the best
-        if combined_results:
-            combined_results.sort(key=lambda x: x[0])
-            final_results = combined_results[:keep_points]
-            
-            print(f"Stage 1 completed: Kept {len(final_results)} best points from {len(combined_results)} points")
-            print(f"Best Chi2: {final_results[0][0]:.6f}")
-            print(f"Stage 1 total time: {stage1_total_time:.2f}s")
-            
-            # Display process time statistics
-            if all_times:
-                avg_time = sum(all_times) / len(all_times)
-                max_time = max(all_times)
-                min_time = min(all_times)
-                print(f"  Average: {avg_time:.2f}s, Longest: {max_time:.2f}s, Shortest: {min_time:.2f}s")
-                print(f"  Load balancing efficiency: {avg_time/max_time*100:.1f}%")
-            
-            return final_results
-        else:
-            print("Error: No valid results")
-            return None
-    else:
-        return None
-        
-def mpi_optimize_stage2(model_type, stage1_results, total_steps, batch_size, 
-                       parameter_ranges, neutrino_params):
-    """MPI Stage 2 optimization main function"""
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    size = comm.Get_size()
-    
-    if rank == 0:
-        print(f"MPI Stage 2 Optimization: Input points={len(stage1_results)}, Processes={size}")
-    
-    # Distribute tasks to each process
-    if rank == 0:
-        points_per_process = len(stage1_results) // size
-        remainder = len(stage1_results) % size
-        
-        tasks = []
-        for i in range(size):
-            if i < remainder:
-                start = i * (points_per_process + 1)
-                end = start + points_per_process + 1
-            else:
-                start = remainder * (points_per_process + 1) + (i - remainder) * points_per_process
-                end = start + points_per_process
-            tasks.append(stage1_results[start:end])
-    else:
-        tasks = None
-    
-    # Distribute tasks
-    my_tasks = comm.scatter(tasks, root=0)
-    
-    # Optimize own tasks on this process
-    my_results = []
-    start_time = time.time()
-    
-    for i, task in enumerate(my_tasks):
-        best_chi2, best_params = parallel_table_search_momentum_mpi(
-            model_type=model_type,
-            initial_point=task,
-            total_steps=total_steps,
-            batch_size=batch_size,
-            parameter_ranges=parameter_ranges,
-            neutrino_params=neutrino_params
-        )
-        
-        my_results.append([best_chi2] + best_params)
-        
-    #    if (i + 1) % max(1, len(my_tasks) // 5) == 0:
-    #        elapsed = time.time() - start_time
-    #        print(f"Process {rank}: Completed {i+1}/{len(my_tasks)} Stage 2 optimization points")
-    
-    # Collect all results
-    all_results = comm.gather(my_results, root=0)
-    
-    if rank == 0:
-        # Merge all results
-        combined_results = []
-        for process_results in all_results:
-            combined_results.extend(process_results)
-        
-        # Sort results
-        combined_results.sort(key=lambda x: x[0])
-        
-        stage2_time = time.time() - start_time
-        print(f"Stage 2 completed: {stage2_time:.2f}s")
-        print(f"Final best Chi2: {combined_results[0][0]:.6f}")
-        
-        return combined_results
-    else:
-        return None
+        except Exception:
+            chi2 = self.evaluate_chi2(params)
+            return (chi2, params, False)
 
-# ==================== MPI main function ====================
-def main_mpi():
-    """MPI main function"""
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    size = comm.Get_size()
+# ==================== Main Function ====================
+def main():
+    # Broadcast octant parameter to all processes
+    octant = comm.bcast(args.octant if is_master else None, root=0)
     
-    # Only rank 0 parses arguments
-    if rank == 0:
-        parser = argparse.ArgumentParser(description='MPI multi-node two-stage optimization program')
-        
-        # General parameters
-        parser.add_argument('--model', type=str, choices=['M1', 'M2', 'M3'], required=True,
-                          help='Model type to optimize')
-        parser.add_argument('--output-dir', type=str, default='./mpi_results', help='Output directory')
-        parser.add_argument('--run-mode', type=str, choices=['stage1', 'stage2', 'both'], default='both', 
-                          help='Run mode')
-        parser.add_argument('--neutrino-version', type=str, choices=['1st', '2nd'], default='1st',
-                          help='Neutrino parameter version')
-        
-        # Stage 1 parameters - using correct short names
-        parser.add_argument('--total-initial-points', type=int, default=1024, 
-                          help='Total initial points for Stage 1')
-        parser.add_argument('--iterations-per-point', type=int, default=50000, 
-                          help='Iterations per point in Stage 1')
-        parser.add_argument('--learning-rate', type=float, default=0.1, 
-                          help='Learning rate for Stage 1')
-        parser.add_argument('--keep-points', type=int, default=256,
-                          help='Number of best points to keep from Stage 1')
-        
-        # Stage 2 parameters - using correct short names
-        parser.add_argument('--total-steps', type=int, default=2000, 
-                          help='Total steps for Stage 2')
-        parser.add_argument('--batch-size', type=int, default=32, 
-                          help='Batch size for Stage 2')
-        
-        args = parser.parse_args()
-        
-        # Create output directory
-        os.makedirs(args.output_dir, exist_ok=True)
-        
-        print("MPI multi-node two-stage optimization program started")
-        print(f"Model type: {args.model}")
-        print(f"Neutrino version: {args.neutrino_version}")
-        print(f"Number of processes: {size}")
-        print(f"Run mode: {args.run_mode}")
-        print(f"Output directory: {args.output_dir}")
-        
-        if args.run_mode in ['stage1', 'both']:
-            print(f"Stage 1: Total points={args.total_initial_points}, Iterations per point={args.iterations_per_point}")
-            print(f"        Learning rate={args.learning_rate}, Keep points={args.keep_points}")
-        
-        if args.run_mode in ['stage2', 'both']:
-            print(f"Stage 2: Total steps={args.total_steps}, Batch size={args.batch_size}")
-        
-    else:
-        args = None
+    # All processes create optimizer with same octant parameter
+    optimizer = DirectOptimizer(args.model, octant)
     
-    # Broadcast parameters
-    args = comm.bcast(args, root=0)
-    
-    # Set neutrino parameters and parameter ranges
-    neutrino_params = setup_neutrino_params(args.neutrino_version)
-    parameter_ranges = get_parameter_ranges(args.model)
-    
-    # Stage 1 optimization
-    stage1_results = None
-    if args.run_mode in ['stage1', 'both']:
-        if rank == 0:
-            print(f"\n=== Starting MPI Stage 1 Optimization ===")
+    if is_master:
+        # Phase 1: Generate initial points
+        start_time = time.time()
         
-        stage1_results = mpi_optimize_stage1(
-            model_type=args.model,
-            total_initial_points=args.total_initial_points,  
-            iterations_per_point=args.iterations_per_point,  
-            learning_rate=args.learning_rate, 
-            parameter_ranges=parameter_ranges,
-            neutrino_params=neutrino_params,
-            keep_points=args.keep_points 
-        )
+        initial_points = []
+        for i in range(args.n_points):
+            params = optimizer.random_point()
+            chi2 = optimizer.evaluate_chi2(params)
+            initial_points.append((chi2, params))
         
-        # Save Stage 1 results
-        if rank == 0 and stage1_results is not None:
-            stage1_file = os.path.join(args.output_dir, f'{args.model}_{args.neutrino_version}_stage1.dat')
-            with open(stage1_file, 'w') as f:
-                f.write(f"# MPI Stage 1 optimization results - Model: {args.model}, Neutrino version: {args.neutrino_version}\n")
-                f.write(f"# Total search points: {args.total_initial_points}, Kept points: {len(stage1_results)}\n")
-                for row in stage1_results:
-                    f.write(" ".join(f"{x:.12e}" for x in row) + "\n")
-            print(f"Stage 1 results saved to: {stage1_file}")
-    
-    # Stage 2 optimization
-    if args.run_mode in ['stage2', 'both']:
-        if rank == 0:
-            print(f"\n=== Starting MPI Stage 2 Optimization ===")
+        # Display initial statistics
+        if initial_points:
+            initial_chi2s = [chi2 for chi2, _ in initial_points]
+            log_important(f"\nInitial points generated ({args.n_points} points)")
+            log_important(f"Initial chi² range: {min(initial_chi2s):.2e} - {max(initial_chi2s):.2e}")
+        
+        # Phase 2: Distribute tasks
+        points_per_proc = args.n_points // size
+        remainder = args.n_points % size
+        
+        # Master process tasks
+        my_start = 0
+        my_end = points_per_proc + (1 if 0 < remainder else 0)
+        my_points = initial_points[my_start:my_end]
+        
+        # Send tasks to worker processes
+        for proc in range(1, size):
+            proc_start = my_end
+            proc_end = proc_start + points_per_proc + (1 if proc < remainder else 0)
             
-            # If loading Stage 1 results from file
-            if stage1_results is None and args.run_mode == 'stage2':
-                stage1_file = os.path.join(args.output_dir, f'{args.model}_{args.neutrino_version}_stage1.dat')
-                if os.path.exists(stage1_file):
-                    stage1_results = []
-                    with open(stage1_file, 'r') as f:
-                        for line in f:
-                            if line.startswith('#'):
-                                continue
-                            values = list(map(float, line.strip().split()))
-                            stage1_results.append(values)
-                    print(f"Loaded {len(stage1_results)} Stage 1 results from file")
-                else:
-                    print(f"Error: Stage 1 results file not found: {stage1_file}")
-                    return
-        
-        # Broadcast Stage 1 results to all processes
-        stage1_results = comm.bcast(stage1_results, root=0)
-        
-        final_results = mpi_optimize_stage2(
-            model_type=args.model,
-            stage1_results=stage1_results,
-            total_steps=args.total_steps,
-            batch_size=args.batch_size,
-            parameter_ranges=parameter_ranges,
-            neutrino_params=neutrino_params
-        )
-        
-        # Save final results
-        if rank == 0 and final_results is not None:
-            final_file = os.path.join(args.output_dir, f'{args.model}_{args.neutrino_version}.dat')
-            with open(final_file, 'w') as f:
-                f.write(f"# MPI final optimization results - Model: {args.model}, Neutrino version: {args.neutrino_version}\n")
-                f.write(f"# Input points: {len(stage1_results)}, Output points: {len(final_results)}\n")
-                for row in final_results:
-                    f.write(" ".join(f"{x:.12e}" for x in row) + "\n")
+            num_points = proc_end - proc_start
+            comm.send(num_points, dest=proc, tag=1)
             
-            print(f"\n=== MPI optimization completed ===")
-            print(f"Final results saved to: {final_file}")
-            print(f"Best Chi2: {final_results[0][0]:.6f}")
+            # Send point data
+            for i in range(proc_start, proc_end):
+                chi2, params = initial_points[i]
+                comm.send(chi2, dest=proc, tag=2)
+                param_list = optimizer.params_to_list(params)
+                comm.send(param_list, dest=proc, tag=3)
             
-            # Display top 5 best results
-            print(f"\nTop 5 best results:")
-            for i in range(min(5, len(final_results))):
-                print(f"  {i+1}. Chi2 = {final_results[i][0]:.6f}")
+            my_end = proc_end
+        
+        log_important(f"Task distribution complete: Master {len(my_points)} points, Total {size} processes")
+        
+        # Phase 3: Master process optimization
+        log_important(f"\nStarting optimization ({args.n_points} points)...")
+        opt_start = time.time()
+        
+        my_results = []
+        success_count = 0
+        
+        for i, (chi2, params) in enumerate(my_points):
+            opt_chi2, opt_params, success = optimizer.optimize_point(
+                params, args.n_generations, args.pop_size
+            )
+            
+            my_results.append((opt_chi2, opt_params))
+            if success:
+                success_count += 1
+            
+            # Display progress at milestones
+            if (i + 1) == len(my_points) or ((i + 1) % max(1, len(my_points)//4) == 0):
+                elapsed = time.time() - opt_start
+                progress = (i + 1) / len(my_points) * 100
                 
+                if my_results:
+                    current_best = min([r[0] for r in my_results])
+                    log_important(f"  Progress: {progress:.0f}%, Current best: {current_best:.2e}")
+        
+        # Phase 4: Collect results
+        all_results = my_results.copy()
+        
+        for proc in range(1, size):
+            num_results = comm.recv(source=proc, tag=4)
+            
+            for _ in range(num_results):
+                chi2 = comm.recv(source=proc, tag=5)
+                param_list = comm.recv(source=proc, tag=6)
+                params = optimizer.list_to_params(param_list)
+                all_results.append((chi2, params))
+        
+        # Collect success counts
+        total_success = success_count
+        for proc in range(1, size):
+            proc_success = comm.recv(source=proc, tag=7)
+            total_success += proc_success
+        
+        # Process results
+        all_results.sort(key=lambda x: x[0])
+        
+        # Build output file path with octant information
+        output_file = os.path.join(args.output_dir, f"{args.output}_{args.model}_{octant}.dat")
+        
+        # Write to file
+        with open(output_file, 'w') as f:
+            # Write header information
+            f.write(f"# Model: {args.model}\n")
+            f.write(f"# Octant: {octant}\n")
+            f.write(f"# Total points: {len(all_results)}\n")
+            f.write(f"# Successful: {total_success}/{args.n_points}\n")
+            f.write(f"# Parameters: {', '.join(optimizer.param_names)}\n")
+            f.write("#" + "="*80 + "\n")
+            
+            # Write column headers
+            f.write(f"{'chi^2':<20} ")
+            for name in optimizer.param_names:
+                f.write(f"{name:<15} ")
+            f.write("\n")
+            
+            # Write data (sorted by chi² ascending)
+            for chi2, params in all_results:
+                f.write(f"{chi2:<20.10e} ")
+                param_list = optimizer.params_to_list(params)
+                for param in param_list:
+                    f.write(f"{param:<15.6e} ")
+                f.write("\n")
+        
+        total_time = time.time() - start_time
+        
+        # Final statistics
+        log_important(f"\n{'='*60}")
+        log_important("Optimization complete!")
+        
+        if all_results:
+            # Show only the most important results
+            log_important(f"\nBest results:")
+            for i in range(min(5, len(all_results))):
+                chi2 = all_results[i][0]
+                log_important(f"  Rank {i+1}: chi² = {chi2:.6f}")
+            
+            log_important(f"\nStatistics:")
+            log_important(f"  Octant: {octant}")
+            log_important(f"  Success rate: {total_success}/{args.n_points} ({total_success/args.n_points*100:.1f}%)")
+            log_important(f"  Total time: {total_time:.1f}s")
+            log_important(f"  Average per point: {total_time/args.n_points:.1f}s")
+            log_important(f"  Output file: {output_file}")
+        
+        log_important('='*60)
+    
+    else:
+        # Worker process logic
+        num_points = comm.recv(source=0, tag=1)
+        
+        # Receive point data
+        my_points = []
+        for i in range(num_points):
+            chi2 = comm.recv(source=0, tag=2)
+            param_list = comm.recv(source=0, tag=3)
+            params = optimizer.list_to_params(param_list)
+            my_points.append((chi2, params))
+        
+        # Start optimization (no progress display)
+        my_results = []
+        success_count = 0
+        
+        for chi2, params in my_points:
+            opt_chi2, opt_params, success = optimizer.optimize_point(
+                params, args.n_generations, args.pop_size
+            )
+            
+            my_results.append((opt_chi2, opt_params))
+            if success:
+                success_count += 1
+        
+        # Send results
+        comm.send(len(my_results), dest=0, tag=4)
+        
+        for chi2, params in my_results:
+            comm.send(chi2, dest=0, tag=5)
+            param_list = optimizer.params_to_list(params)
+            comm.send(param_list, dest=0, tag=6)
+        
+        # Send success count
+        comm.send(success_count, dest=0, tag=7)
+        
+        # Only show completion in verbose mode
+        if args.verbose:
+            log_info(f"Completed {num_points} points (Octant: {octant})")
+
+# ==================== Execution ====================
 if __name__ == "__main__":
-    main_mpi()
+    main()

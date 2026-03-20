@@ -3,20 +3,11 @@ This folder lists data of model parameters used in Figure 1 in arXiv:2511.16196,
 
 Data in each files are interpreted below.
 
-M1_1st.dat gives values of model parameters for Model 1 and \theta_{23} in the first octant case, shown in the first line of FIG. 1, 
-19 columns are included, each line gives {D_{11}, D_{22}, D_{33}, S_{11}, S_{12}, S_{13}, S_{22}, S_{23}, S_{33}, s_1, s_2, s_3, s_4, s_5, s_6, r_1, r_2, \omega, m_0}
+MiNj.dat (i=1,2,3, j=1,2) gives values of model parameters for Model Mi in fitting data Nj in Normal ordering, shown in Fig. 3, 
+MiIj.dat (i=  2,3, j=1,2) gives values of model parameters for Model Mi in fitting data Ij in Inverted ordering, shown in Fig. 4.
 
-M2_1st.dat gives values of model parameters for Model 2 and \theta_{23} in the first octant case, shown in the third line of FIG. 1, 
-19 columns are included, each line gives {S_{11}, S_{12}, S_{13}, S_{22}, S_{23}, S_{33}, D_{11}, D_{22}, D_{33}, a_{12}, a_{13}, a_{23}, \alpha, \lambda, r_1, r_4, \omega, \gamma, m_0}
+In M1, 19 columns are included, {D_{11}, D_{22}, D_{33}, S_{11}, S_{12}, S_{13}, S_{22}, S_{23}, S_{33}, s_1, s_2, s_3, s_4, s_5, s_6, r_1, r_2, \omega, m_0}
 
-M3_1st.dat gives values of model parameters for Model 3 and \theta_{23} in the first octant case, shown in the fifth line of FIG. 1, 
-18 columns are included, each line gives {S_{11}, S_{12}, S_{13}, S_{22}, S_{23}, S_{33}, D_{11}, D_{22}, D_{33}, a_{12}, a_{13}, a_{23}, r_1, r_2, r_3, r_4, r_5, m_0}
+In M2, 19 columns are included, {S_{11}, S_{12}, S_{13}, S_{22}, S_{23}, S_{33}, D_{11}, D_{22}, D_{33}, a_{12}, a_{13}, a_{23}, \alpha, \lambda, r_1, r_4, \omega, \gamma, m_0}
 
-M1_2nd.dat gives values of model parameters for Model 1 and \theta_{23} in the second octant case, shown in the second line of FIG. 1, 
-Data arranged in the same format as M1_1st.dat
-
-M2_2nd.dat gives values of model parameters for Model 2 and \theta_{23} in the second octant case, shown in the fourth line of FIG. 1, 
-Data arranged in the same format as M2_1st.dat
-
-M3_2nd.dat gives values of model parameters for Model 3 and \theta_{23} in the second octant case, shown in the sixth line of FIG. 1, 
-Data arranged in the same format as M3_1st.dat
+In M3, 18 columns are included, {S_{11}, S_{12}, S_{13}, S_{22}, S_{23}, S_{33}, D_{11}, D_{22}, D_{33}, a_{12}, a_{13}, a_{23}, r_1, r_2, r_3, r_4, r_5, m_0}
